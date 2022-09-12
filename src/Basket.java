@@ -7,7 +7,6 @@ public class Basket {
     protected int total = 0;
     protected static int[] totalPrice = new int[6];
     protected static int[] totalAmountOfProducts = new int[6];
-    Basket basket;
 
     protected Basket(int[] prices, String[] products) {
         this.prices = prices;
