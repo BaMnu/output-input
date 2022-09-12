@@ -2,38 +2,29 @@ import java.io.*;
 import java.util.*;
 
 public class Basket {
-
-    static protected int[] prices;
-    static protected String[] products;
+    public static int[] prices = getPrices();
+    public String[] products;
     protected int total = 0;
-    protected int[] totalPrice;
-    protected int[] totalAmountOfProducts;
+    protected static int[] totalPrice = new int[6];
+    protected static int[] totalAmountOfProducts = new int[6];
+    Basket basket;
 
-    //    protected int[] productNumber;
     public Basket(int[] prices, String[] products) {
         this.prices = prices;
         this.products = products;
-
-        this.totalPrice = new int[prices.length];
-        this.totalAmountOfProducts = new int[products.length];
     }
 
     protected void addToCart(int productNum, int amount) {
-        productNum -= 1;
         totalAmountOfProducts[productNum] += amount;
         totalPrice[productNum] += prices[productNum] * totalAmountOfProducts[productNum];
-    }
 
-    protected void printCart() {
-        System.out.println("Ваша корзина:\n");
-        for (int i = 0; i < products.length; i++) {
-            if (totalAmountOfProducts[i] != 0) {
-                System.out.printf("%s %d шт. %d руб./шт. %d руб. в сумме%n",
-                        products[i], totalAmountOfProducts[i], prices[i], totalPrice[i]);
-            }
-            total += totalPrice[i];
+        if (amount == 0 || (totalPrice[productNum] + amount) < 0) {
+            System.out.println("Товар: '" + products[productNum] + "' удален из корзины");
+            totalPrice[productNum] = 0;
+            totalAmountOfProducts[productNum] = 0;
+            prices[productNum] = 0;
+            total = 0;
         }
-        System.out.println("\nИтого:" + total + " руб.");
     }
 
     protected void saveTxt(File textFile) throws IOException {
@@ -50,40 +41,39 @@ public class Basket {
         }
     }
 
-    protected static Basket loadFromTxtFile(File textFile) throws IOException {
-        // новая строка
+    protected void printCart() {
+        System.out.println("Ваша корзина:\n");
+        for (int i = 0; i < products.length; i++) {
+            if (totalAmountOfProducts[i] != 0) {
+                System.out.printf("%s %d шт. %d руб./шт. %d руб. в сумме%n",
+                        products[i], totalAmountOfProducts[i], prices[i], totalPrice[i]);
+            }
+            total += totalPrice[i];
+        }
+        System.out.println("\nИтого:" + total + " руб.");
+    }
+
+    protected static void loadFromTxtFile(File textFile) throws IOException {
         String line = null;
 
-        // считываем файл
         try (BufferedReader reader = new BufferedReader(new FileReader(textFile))) {
-            // записываем в новую строку
             line = reader.readLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        // разбиваем строку на строковый массив с разделителем
-        String[] arrayLine = line.split(" ");
-        // создаем числовой массив размером в строковый массив выше
-        int[] loadedAmount = new int[arrayLine.length];
-        // переносим элементы строкового массива в элементы числового массива
-        for (int i = 0; i < loadedAmount.length; i++) {
-            loadedAmount[i] = Integer.parseInt(arrayLine[i]);
-        }
-        // ... и че дальше??))
-        Basket load = new Basket(prices, products){
-        };
 
-        return null;
+        String[] arrayLine = line.split(" ");
+        totalAmountOfProducts = new int[arrayLine.length];
+
+        for (int i = 0; i < totalAmountOfProducts.length; i++) {
+            totalAmountOfProducts[i] = Integer.parseInt(arrayLine[i]);
+            if (totalAmountOfProducts[i] != 0) {
+                totalPrice[i] = prices[i] * totalAmountOfProducts[i];
+            }
+        }
     }
 
-    //геттеры, которые вы посчитаете нужными.
-    protected int[] getPrices() {
+    public static int[] getPrices() {
         return prices;
     }
-
-    protected String[] getProducts() {
-        return products;
-    }
-
 }
-
