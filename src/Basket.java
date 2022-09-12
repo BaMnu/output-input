@@ -2,22 +2,19 @@ import java.io.*;
 import java.util.*;
 
 public class Basket {
-    public static int[] prices = getPrices();
-    public String[] products;
+    protected static int[] prices = getPrices();
+    protected String[] products;
     protected int total = 0;
     protected static int[] totalPrice = new int[6];
     protected static int[] totalAmountOfProducts = new int[6];
     Basket basket;
 
-    public Basket(int[] prices, String[] products) {
+    protected Basket(int[] prices, String[] products) {
         this.prices = prices;
         this.products = products;
     }
 
     protected void addToCart(int productNum, int amount) {
-        totalAmountOfProducts[productNum] += amount;
-        totalPrice[productNum] += prices[productNum] * totalAmountOfProducts[productNum];
-
         if (amount == 0 || (totalPrice[productNum] + amount) < 0) {
             System.out.println("Товар: '" + products[productNum] + "' удален из корзины");
             totalPrice[productNum] = 0;
@@ -25,6 +22,8 @@ public class Basket {
             prices[productNum] = 0;
             total = 0;
         }
+        totalAmountOfProducts[productNum] += amount;
+        totalPrice[productNum] += prices[productNum] * totalAmountOfProducts[productNum];
     }
 
     protected void saveTxt(File textFile) throws IOException {
