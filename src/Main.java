@@ -4,7 +4,7 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) throws IOException {
         Scanner sc = new Scanner(System.in);
-        File textFile = new File("myBasket.txt");
+        File file = new File("basket.bin");
 
         String[] products = {"Хлеб", "Сыр", "Гречневая крупа", "Яблоки", "Помидоры", "Огурцы"};
         int[] prices = {40, 250, 100, 80, 200, 120};
@@ -19,20 +19,20 @@ public class Main {
         int prodNum;
         int prodCount;
 
-        if (textFile.exists()) {
+        if (file.exists()) {
             try {
-                Basket.loadFromTxtFile(textFile);
-                basket.printCart();
+                basket = Basket.loadFromBinFile(file);
             } catch (IOException e) {
                 throw new IOException(e);
             }
         } else {
             System.out.println("Ваша корзина пуста. Наполните корзину товарами.");
-            textFile = new File("myBasket.txt");
+            file = new File("basket.bin");
         }
-
         while (true) {
-            System.out.println("\nВыберите товар и кол-во, либо введите 'end' для завершения");
+            System.out.println("\nВыберите товар и кол-во. " +
+                    "Введите 0 в кол-во, чтобы удалить товар из корзины. " +
+                    "Введите 'end' для завершения");
             try {
                 String insert = sc.nextLine();
                 if ("end".equals(insert)) {
@@ -49,10 +49,9 @@ public class Main {
                 continue;
             }
             basket.addToCart(prodNum, prodCount);
-
         }
-        basket.saveTxt(textFile);
         basket.printCart();
+        basket.saveBin(file);
 
         sc.close();
     }

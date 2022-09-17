@@ -1,79 +1,60 @@
 import java.io.*;
-import java.util.*;
 
-public class Basket {
-    public static int[] prices = getPrices();
-    public String[] products;
-    protected int total = 0;
-    protected static int[] totalPrice = new int[6];
-    protected static int[] totalAmountOfProducts = new int[6];
-    Basket basket;
+public class Basket implements Serializable {
+    private final int[] prices;
+    private final String[] products;
+    protected int[] amountOfProducts;
+    private static final long SerialVersionUID = 1L;
 
-    public Basket(int[] prices, String[] products) {
+    protected Basket(int[] prices, String[] products) {
         this.prices = prices;
         this.products = products;
+        amountOfProducts = new int[products.length];
     }
 
     protected void addToCart(int productNum, int amount) {
-        totalAmountOfProducts[productNum] += amount;
-        totalPrice[productNum] += prices[productNum] * totalAmountOfProducts[productNum];
 
-        if (amount == 0 || (totalPrice[productNum] + amount) < 0) {
+        if (amount != 0) {
+            amountOfProducts[productNum] += amount;
+        } else {
             System.out.println("Товар: '" + products[productNum] + "' удален из корзины");
-            totalPrice[productNum] = 0;
-            totalAmountOfProducts[productNum] = 0;
+            amountOfProducts[productNum] = 0;
             prices[productNum] = 0;
-            total = 0;
-        }
-    }
-
-    protected void saveTxt(File textFile) throws IOException {
-        try (PrintWriter writer = new PrintWriter(textFile)) {
-            for (int i = 0; i < products.length; i++) {
-                if (totalAmountOfProducts[i] != 0) {
-                    writer.print(totalAmountOfProducts[i] + " ");
-                } else {
-                    writer.print(0 + " ");
-                }
-            }
-        } catch (IOException e) {
-            throw new IOException(e);
         }
     }
 
     protected void printCart() {
+        int total = 0;
         System.out.println("Ваша корзина:\n");
         for (int i = 0; i < products.length; i++) {
-            if (totalAmountOfProducts[i] != 0) {
-                System.out.printf("%s %d шт. %d руб./шт. %d руб. в сумме%n",
-                        products[i], totalAmountOfProducts[i], prices[i], totalPrice[i]);
+            if (amountOfProducts[i] != 0) {
+                System.out.println(products[i] + " " + amountOfProducts[i] + " шт. " + +prices[i] + " руб./шт. " +
+                        (prices[i] * amountOfProducts[i]) + " руб. в сумме");
+                total += prices[i] * amountOfProducts[i];
             }
-            total += totalPrice[i];
         }
         System.out.println("\nИтого:" + total + " руб.");
     }
 
-    protected static void loadFromTxtFile(File textFile) throws IOException {
-        String line = null;
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(textFile))) {
-            line = reader.readLine();
+    protected void saveBin(File file) throws IOException {
+        try (ObjectOutputStream writer = new ObjectOutputStream(new FileOutputStream(file))) {
+            writer.writeObject(this);
+            writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        String[] arrayLine = line.split(" ");
-        totalAmountOfProducts = new int[arrayLine.length];
-
-        for (int i = 0; i < totalAmountOfProducts.length; i++) {
-            totalAmountOfProducts[i] = Integer.parseInt(arrayLine[i]);
-            if (totalAmountOfProducts[i] != 0) {
-                totalPrice[i] = prices[i] * totalAmountOfProducts[i];
-            }
-        }
     }
 
-    public static int[] getPrices() {
-        return prices;
+    public static Basket loadFromBinFile(File file) throws IOException, ClassCastException {
+        Basket load = null;
+        try (ObjectInputStream reader = new ObjectInputStream(new FileInputStream(file))) {
+            load = (Basket) reader.readObject();
+            load.printCart();
+        } catch (IOException io) {
+            throw new IOException(io);
+        } catch (ClassCastException | ClassNotFoundException cc) {
+            cc.printStackTrace();
+        }
+        return load;
     }
 }
