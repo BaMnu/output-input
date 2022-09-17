@@ -32,7 +32,9 @@ public class Main {
         }
 
         while (true) {
-            System.out.println("\nВыберите товар и кол-во, либо введите 'end' для завершения");
+            System.out.println("\nВыберите товар и кол-во. " +
+                    "Введите 0 в кол-во, чтобы удалить товар из корзины. " +
+                    "Введите 'end' для завершения");
             try {
                 String insert = sc.nextLine();
                 if ("end".equals(insert)) {
