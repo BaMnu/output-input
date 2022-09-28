@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<config>
+    <load>
+        <enabled>true</enabled>
+        <fileName>basket.json</fileName>
+        <format>json</format>
+    </load>
+
+    <save>
+        <enabled>true</enabled>
+        <fileName>basket.json</fileName>
+        <format>json</format>
+    </save>
+
+    <log>
+        <enabled>true</enabled>
+        <fileName>client.csv</fileName>
+    </log>
+</config>
